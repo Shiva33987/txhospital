@@ -1,0 +1,15 @@
+{
+  "name": "tx-miyapur-backend",
+  "version": "1.0.0",
+  "description": "API for TX Hospitals Miyapur website",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
