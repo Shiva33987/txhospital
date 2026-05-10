@@ -68,6 +68,7 @@ export const hospitalContent = {
         "Back pain radiating to legs or hands"
       ]
     },
+  ],
   departments: [
     "Cardiac Sciences",
     "Oncology",

@@ -6,6 +6,12 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  Twitter,
+  Mail,
+  MapPin,
   Activity,
   Ambulance,
   ArrowUpRight,
@@ -174,8 +180,10 @@ const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 function DiseasesConditions() {
   const [search, setSearch] = useState("");
-  const [activeLetter, setActiveLetter] = useState("A");
+  const [activeLetter, setActiveLetter] = useState(null);
   const [selectedDisease, setSelectedDisease] = useState(null);
+  const detailRef = useRef(null);
+  const resultsRef = useRef(null);
 
   const filtered = useMemo(() => {
     if (search.trim()) {
@@ -195,11 +203,18 @@ function DiseasesConditions() {
     } else {
       setActiveLetter(letter);
       setSearch("");
+      setSelectedDisease(null);
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 50);
     }
   };
 
   const handleDiseaseClick = (disease) => {
     setSelectedDisease(disease);
+    setTimeout(() => {
+      detailRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 50);
   };
 
   const closeModal = () => {
@@ -210,7 +225,14 @@ function DiseasesConditions() {
     <>
       <div className="diseases-section">
         <div className="diseases-header">
+          {/* Left dark panel */}
           <div className="diseases-header-left">
+            <div className="diseases-header-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+            </div>
             <h2 className="diseases-title">Diseases &amp; Conditions</h2>
             <p className="diseases-subtitle">Easy-to-understand answers about diseases and conditions</p>
             <p className="diseases-search-label">Search diseases &amp; conditions</p>
@@ -219,14 +241,21 @@ function DiseasesConditions() {
               <input
                 className="diseases-search-input"
                 type="text"
-                placeholder="Search..."
+                placeholder="Search diseases or conditions..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
+              <button className="diseases-search-btn" onClick={() => {}}>
+                <ChevronRight size={18} />
+              </button>
             </div>
           </div>
+
+          {/* Right panel */}
           <div className="diseases-header-right">
-            <p className="diseases-alpha-label">Find diseases &amp; conditions by first letter</p>
+            <p className="diseases-alpha-label">
+              Find diseases &amp; conditions by <span className="diseases-alpha-highlight">first letter</span>
+            </p>
             <div className="diseases-alpha-grid">
               {ALPHABET.map((letter) => (
                 <button
@@ -238,15 +267,42 @@ function DiseasesConditions() {
                 </button>
               ))}
             </div>
+
+            {/* Popular searches */}
+            <div className="diseases-popular">
+              <div className="diseases-popular-label">
+                <span className="diseases-popular-dot" />
+                Popular Searches
+                <span className="diseases-popular-dot" />
+              </div>
+              <div className="diseases-popular-grid">
+                {[
+                  { name: "Diabetes",         icon: "🩸" },
+                  { name: "Hypertension",     icon: "❤️" },
+                  { name: "Arthritis",        icon: "🦴" },
+                  { name: "Thyroid Disorders",icon: "🦋" },
+                  { name: "Asthma",           icon: "🫁" },
+                ].map((item) => (
+                  <button
+                    key={item.name}
+                    className="diseases-popular-chip"
+                    onClick={() => { setSearch(item.name); setActiveLetter(null); }}
+                  >
+                    <span className="diseases-popular-emoji">{item.icon}</span>
+                    {item.name}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="diseases-results">
+        <div className="diseases-results" ref={resultsRef}>
           <p className="diseases-count">
             {(!activeLetter && !search.trim()) ? "Select a letter or search to find conditions" : `${filtered.length} condition${filtered.length !== 1 ? "s" : ""} found`}
-            {search && (
-              <button className="diseases-clear" onClick={() => setSearch("")}>
-                ✕ Clear Results
+            {(search || activeLetter) && (
+              <button className="diseases-clear" onClick={() => { setSearch(""); setActiveLetter(null); setSelectedDisease(null); }}>
+                ✕ Clear
               </button>
             )}
           </p>
@@ -267,7 +323,7 @@ function DiseasesConditions() {
           )}
 
           {selectedDisease && (
-            <div className="disease-detail-panel">
+            <div className="disease-detail-panel" ref={detailRef}>
               <button className="disease-detail-back" onClick={closeModal}>
                 <ChevronLeft size={20} /> Back to results
               </button>
@@ -336,6 +392,140 @@ function DiseasesConditions() {
   );
 }
 
+const TECH_SLIDES = [
+  {
+    label: "Cardiac Imaging",
+    title: "Advanced Cardiac\nDiagnostics",
+    description: "State-of-the-art echocardiography, cardiac CT and MRI for precise heart disease diagnosis and treatment planning.",
+    detail: "64-slice CT Angiography · 3D Echo · Stress Testing · Holter Monitoring",
+    gradient: "linear-gradient(135deg, #be185d 0%, #7c3aed 60%, #1e40af 100%)",
+    image: "https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?auto=format&fit=crop&q=80&w=900",
+    icon: HeartPulse
+  },
+  {
+    label: "Neuro Sciences",
+    title: "Neuro Diagnostics\n& Intervention",
+    description: "High-field MRI, EEG and EMG systems enabling accurate diagnosis of brain, spine and nervous system conditions.",
+    detail: "3T MRI · EEG · EMG · Nerve Conduction Studies · Neuro Navigation",
+    gradient: "linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #be185d 100%)",
+    image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&q=80&w=900",
+    icon: Brain
+  },
+  {
+    label: "Robotic Surgery",
+    title: "Robotic-Assisted\nSurgical Systems",
+    description: "Minimally invasive robotic surgery for greater precision, smaller incisions and faster patient recovery across specialties.",
+    detail: "Robotic Laparoscopy · Endoscopic Surgery · Minimal Blood Loss · Faster Recovery",
+    gradient: "linear-gradient(135deg, #064e3b 0%, #065f46 50%, #be185d 100%)",
+    image: "https://images.unsplash.com/photo-1551601651-2a8555f1a136?auto=format&fit=crop&q=80&w=900",
+    icon: Activity
+  },
+  {
+    label: "Oncology",
+    title: "Cancer Care\nTechnology",
+    description: "Advanced radiation therapy, PET-CT scanning and targeted treatment systems for comprehensive cancer management.",
+    detail: "PET-CT · Linear Accelerator · Brachytherapy · Tumour Board Reviews",
+    gradient: "linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #1e40af 100%)",
+    image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=900",
+    icon: Radiation
+  },
+  {
+    label: "Diagnostics Lab",
+    title: "Full-Spectrum\nDiagnostic Lab",
+    description: "Integrated diagnostic centre with digital X-ray, ultrasound, mammography and advanced pathology for rapid results.",
+    detail: "Digital X-Ray · Ultrasound & Doppler · Mammography · Endoscopy · Colonoscopy",
+    gradient: "linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #be185d 100%)",
+    image: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=900",
+    icon: Stethoscope
+  },
+  {
+    label: "Critical Care",
+    title: "ICU & Emergency\nInfrastructure",
+    description: "Round-the-clock critical care with advanced life support, ventilators and real-time patient monitoring systems.",
+    detail: "Multi-parameter Monitors · Ventilators · Defibrillators · 24/7 Intensivist",
+    gradient: "linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #1e3a5f 100%)",
+    image: "https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&q=80&w=900",
+    icon: Ambulance
+  }
+];
+
+function TechSlider() {
+  const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(null);
+  const [animating, setAnimating] = useState(false);
+
+  const goTo = (index, dir) => {
+    if (animating) return;
+    setDirection(dir);
+    setAnimating(true);
+    setTimeout(() => {
+      setCurrent(index);
+      setAnimating(false);
+    }, 400);
+  };
+
+  const prev = () => goTo((current - 1 + TECH_SLIDES.length) % TECH_SLIDES.length, "left");
+  const next = () => goTo((current + 1) % TECH_SLIDES.length, "right");
+
+  const slide = TECH_SLIDES[current];
+  const Icon = slide.icon;
+
+  return (
+    <div className="tech-slider" style={{ background: slide.gradient }}>
+      {/* Background image */}
+      <div className="tech-slider-bg">
+        <img src={slide.image} alt={slide.label} />
+      </div>
+
+      {/* Glass overlay */}
+      <div className="tech-slider-overlay" />
+
+      {/* Content */}
+      <div className={`tech-slider-content ${animating ? `slide-out-${direction}` : "slide-in"}`}>
+        <div className="tech-slider-left">
+          <p className="tech-slide-label">
+            <Icon size={14} /> {slide.label}
+          </p>
+          <h2 className="tech-slide-title">
+            {slide.title.split("\n").map((line, i) => (
+              <span key={i}>{line}<br /></span>
+            ))}
+          </h2>
+          <p className="tech-slide-desc">{slide.description}</p>
+          <div className="tech-slide-detail">{slide.detail}</div>
+          <button className="tech-slide-btn" onClick={() => document.getElementById("final-cta")?.scrollIntoView({ behavior: "smooth" })}>
+            Book Consultation <ArrowUpRight size={16} />
+          </button>
+        </div>
+        <div className="tech-slider-right">
+          <img src={slide.image} alt={slide.label} />
+        </div>
+      </div>
+
+      {/* Left arrow */}
+      <button className="tech-arrow tech-arrow-left" onClick={prev}>
+        <ChevronLeft size={22} />
+      </button>
+
+      {/* Right arrow */}
+      <button className="tech-arrow tech-arrow-right" onClick={next}>
+        <ChevronRight size={22} />
+      </button>
+
+      {/* Dots */}
+      <div className="tech-dots">
+        {TECH_SLIDES.map((_, i) => (
+          <button
+            key={i}
+            className={`tech-dot ${i === current ? "active" : ""}`}
+            onClick={() => goTo(i, i > current ? "right" : "left")}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const TOTAL_FRAMES = 240;
 const FRAME_RATE = 24; // fps
 
@@ -384,6 +574,108 @@ function HeroFramePlayer() {
     <div className="hero-frame-wrap">
       <canvas ref={canvasRef} className="hero-frame-canvas" />
     </div>
+  );
+}
+
+function Footer() {
+  const currentYear = new Date().getFullYear();
+  
+  return (
+    <footer className="site-footer">
+      <div className="footer-top">
+        <div className="container">
+          <div className="footer-grid">
+            {/* Column 1: Brand */}
+            <div className="footer-col brand-col">
+              <div className="footer-logo">
+                <div className="footer-logo-mark">
+                  <span className="logo-tx">TX</span>
+                  <div className="logo-text">
+                    <span className="logo-h">HOSPITALS</span>
+                    <span className="logo-tag">THERAPY FOR EVERY ILLNESS</span>
+                  </div>
+                </div>
+              </div>
+              <p className="footer-about">
+                TX Hospitals Miyapur brings together clinical excellence and compassionate care, delivering world-class healthcare solutions to the heart of Hyderabad.
+              </p>
+              <div className="footer-social">
+                <a href="#" className="social-link" title="Facebook"><Facebook size={18} /></a>
+                <a href="#" className="social-link" title="Instagram"><Instagram size={18} /></a>
+                <a href="#" className="social-link" title="Twitter"><Twitter size={18} /></a>
+                <a href="#" className="social-link" title="LinkedIn"><Linkedin size={18} /></a>
+              </div>
+            </div>
+
+            {/* Column 2: Specialties */}
+            <div className="footer-col">
+              <h4 className="footer-title">Specialties</h4>
+              <ul className="footer-links">
+                <li><a href="#treatments">Cardiac Sciences</a></li>
+                <li><a href="#treatments">Neuro Sciences</a></li>
+                <li><a href="#treatments">Orthopaedics</a></li>
+                <li><a href="#treatments">Gastroenterology</a></li>
+                <li><a href="#treatments">Oncology</a></li>
+                <li><a href="#treatments">Mother & Child Care</a></li>
+              </ul>
+            </div>
+
+            {/* Column 3: Patient Care */}
+            <div className="footer-col">
+              <h4 className="footer-title">Patient Care</h4>
+              <ul className="footer-links">
+                <li><a href="#why">Why Choose Us</a></li>
+                <li><a href="#insurance">Insurance & Cashless</a></li>
+                <li><a href="#faq">Frequently Asked Questions</a></li>
+                <li><a href="#final-cta">Book Appointment</a></li>
+                <li><a href="#hero">Health Checkups</a></li>
+                <li><a href="#testimonials">Patient Stories</a></li>
+              </ul>
+            </div>
+
+            {/* Column 4: Contact */}
+            <div className="footer-col contact-col">
+              <h4 className="footer-title">Get in Touch</h4>
+              <div className="footer-contact-items">
+                <div className="contact-item">
+                  <MapPin size={18} className="contact-icon" />
+                  <p>Miyapur Main Road, Near Metro Station, Hyderabad, Telangana 500049</p>
+                </div>
+                <div className="contact-item">
+                  <PhoneCall size={18} className="contact-icon" />
+                  <p>+91 91445 14459</p>
+                </div>
+                <div className="contact-item">
+                  <Mail size={18} className="contact-icon" />
+                  <p>info@txhospitals.in</p>
+                </div>
+              </div>
+              <div className="emergency-badge">
+                <Ambulance size={16} />
+                <span>24/7 Emergency: 040 43 43 43 43</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="footer-bottom">
+        <div className="container">
+          <div className="footer-bottom-inner">
+            <p className="copyright">
+              © {currentYear} TX Hospitals. All rights reserved. 
+              <span className="footer-sep">|</span> 
+              NABH Accredited Multi-Specialty Hospital
+            </p>
+            <div className="footer-legal">
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+              <a href="#">Sitemap</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }
 
@@ -479,7 +771,9 @@ export default function App() {
   const [content, setContent] = useState(fallbackContent);
   const [activeFaq, setActiveFaq] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const [navVisible, setNavVisible] = useState(true);
   const [enquireOpen, setEnquireOpen] = useState(false);
+  const lastScrollY = useRef(0);
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -518,16 +812,21 @@ export default function App() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 40);
-      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const currentY = window.scrollY;
+      setScrolled(currentY > 40);
+      
+      // Always keep nav visible when scrolling down, but we can hide it 
+      // if we want a "hide on scroll" effect. However, the user said "don't drop".
+      // We'll keep it visible but allow the CSS transition to handle the "slow slide".
+      setNavVisible(true); 
+
+      lastScrollY.current = currentY;
       const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrolledPercent = (winScroll / height) * 100;
+      const scrolledPercent = (currentY / height) * 100;
       const progressEl = document.querySelector(".scroll-progress");
-      if (progressEl) {
-        progressEl.style.width = scrolledPercent + "%";
-      }
+      if (progressEl) progressEl.style.width = scrolledPercent + "%";
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -608,7 +907,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <header className={`tx-header ${scrolled ? "is-scrolled" : ""}`}>
+      <header className={`tx-header ${scrolled ? "is-scrolled" : ""} ${navVisible ? "nav-visible" : "nav-hidden"}`}>
         <div className="scroll-progress" />
         <div className="tx-nav-wrap">
 
@@ -674,20 +973,22 @@ export default function App() {
             <p className="hero-overlay-sub">
               Comprehensive healthcare services with advanced technology and a patient-first approach.
             </p>
-            <a className="hero-overlay-btn" href="#treatments">
-              Discover Our Services <ArrowUpRight size={16} />
-            </a>
+            <div className="hero-overlay-actions">
+              <a className="hero-overlay-btn" href="#treatments">
+                Discover Our Services <ArrowUpRight size={16} />
+              </a>
+              <button
+                className="hero-enquire-toggle"
+                onClick={() => setEnquireOpen(o => !o)}
+              >
+                <PhoneCall size={16} />
+              </button>
+            </div>
           </div>
 
 
           {/* Right enquire form */}
           <div className="hero-enquire-wrap">
-            <button
-              className="hero-enquire-toggle"
-              onClick={() => setEnquireOpen(o => !o)}
-            >
-              <PhoneCall size={16} />
-            </button>
 
             {enquireOpen && (
               <div className="hero-enquire-panel">
@@ -778,65 +1079,148 @@ export default function App() {
 
         <section id="symptoms" className="section">
           <div className="container">
-            <SectionTitle
-              label="Diseases & Conditions"
-              title="Find the Right Specialist for Your Condition"
-              description="Browse our comprehensive directory of diseases and conditions. Each entry is matched to the right specialist for faster, more accurate care."
-            />
+          <div className="diseases-section-header">
+            <p className="section-kicker">Diseases &amp; Conditions</p>
+            <h2 className="diseases-section-title">
+              Know Your Condition.<br />
+              <span className="diseases-title-accent">Find Your Specialist.</span>
+            </h2>
+            <p className="diseases-section-desc">
+              Explore our A–Z directory of diseases and conditions — each matched to the right specialist for faster, more accurate care.
+            </p>
+          </div>
             <DiseasesConditions />
           </div>
         </section>
 
-        <section id="treatments" className="section section-dark">
-          <div className="container">
-            <SectionTitle
-              label="Treatments / Services"
-              title="Multi-Specialty Treatment Programs"
-              description="Each care pathway is designed with specialist oversight, diagnostic precision and premium patient support."
-            />
-            <div className="treatment-carousel-container">
-              <button
-                className="carousel-arrow left"
-                onClick={() => {
-                  const el = document.getElementById("treatment-track");
-                  el.scrollBy({ left: -400, behavior: "smooth" });
-                }}
-              >
-                <ChevronLeft size={24} />
-              </button>
+        <section id="treatments" className="trt-section">
+          {/* Header */}
+          <div className="trt-header">
+            <p className="trt-kicker">
+              <span className="trt-kicker-line" />
+              Treatments / Services
+              <span className="trt-kicker-line" />
+            </p>
+            <h2 className="trt-title">
+              Multi-Specialty <span className="trt-title-accent">Treatment Programs</span>
+            </h2>
+            <p className="trt-desc">
+              Each care pathway is designed with specialist oversight,<br />
+              diagnostic precision and premium patient support.
+            </p>
+            <div className="trt-divider">
+              <span className="trt-divider-line" />
+              <HeartPulse size={18} className="trt-divider-icon" />
+              <span className="trt-divider-line" />
+            </div>
+          </div>
 
-              <div id="treatment-track" className="treatment-track">
-                {content.treatments.map((treatment, index) => (
-                  <motion.div
-                    key={treatment.title}
-                    className="facility-card reveal"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                  >
-                    <div className="facility-image-wrap">
-                      <img src={treatment.image} alt={treatment.title} />
-                      <div className="facility-overlay">
-                        <h3>{treatment.title}</h3>
-                      </div>
+          {/* Cards carousel */}
+          <div className="trt-carousel-wrap">
+            <button className="trt-arrow trt-arrow-left" onClick={() => {
+              document.getElementById("trt-track").scrollBy({ left: -320, behavior: "smooth" });
+            }}>
+              <ChevronLeft size={20} />
+            </button>
+
+            <div className="trt-track" id="trt-track">
+              {[
+                {
+                  title: "Cardiac Sciences",
+                  desc: "Advanced diagnosis and comprehensive care for heart conditions by expert cardiologists.",
+                  cta: "Explore Cardiac Care",
+                  icon: HeartPulse,
+                  image: "https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?auto=format&fit=crop&q=80&w=600&h=400"
+                },
+                {
+                  title: "Gastro Sciences",
+                  desc: "Expert care for digestive health, liver disorders and advanced endoscopic treatments.",
+                  cta: "Explore Gastro Care",
+                  icon: Activity,
+                  image: "https://images.unsplash.com/photo-1551601651-2a8555f1a136?auto=format&fit=crop&q=80&w=600&h=400"
+                },
+                {
+                  title: "Ortho Sciences",
+                  desc: "Restoring movement and mobility with advanced orthopaedic solutions and surgeries.",
+                  cta: "Explore Ortho Care",
+                  icon: Bone,
+                  image: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&q=80&w=600&h=400"
+                },
+                {
+                  title: "Nephrology",
+                  desc: "Specialized care for kidney health, dialysis and transplantation by experienced nephrologists.",
+                  cta: "Explore Kidney Care",
+                  icon: Activity,
+                  image: "https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?auto=format&fit=crop&q=80&w=600&h=400"
+                },
+                {
+                  title: "Neurology",
+                  desc: "Advanced care for brain, spine and nervous system disorders with precision diagnostics.",
+                  cta: "Explore Neuro Care",
+                  icon: Brain,
+                  image: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&q=80&w=600&h=400"
+                },
+                {
+                  title: "Oncology",
+                  desc: "Complete cancer care with surgery, chemotherapy, radiation and targeted therapy.",
+                  cta: "Explore Cancer Care",
+                  icon: Radiation,
+                  image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=600&h=400"
+                },
+                {
+                  title: "Mother & Child Care",
+                  desc: "Safe maternity, fertility and paediatric care for every stage of life.",
+                  cta: "Explore Mother Care",
+                  icon: Baby,
+                  image: "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&q=80&w=600&h=400"
+                },
+                {
+                  title: "Urology",
+                  desc: "Advanced care for urinary tract, prostate and bladder disorders.",
+                  cta: "Explore Urology Care",
+                  icon: Stethoscope,
+                  image: "https://images.unsplash.com/photo-1559757175-0eb30cd8c063?auto=format&fit=crop&q=80&w=600&h=400"
+                },
+              ].map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <div key={i} className="trt-card">
+                    <div className="trt-card-img">
+                      <img src={item.image} alt={item.title} />
+                      <div className="trt-card-grid-icon">⠿</div>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              <button
-                className="carousel-arrow right"
-                onClick={() => {
-                  const el = document.getElementById("treatment-track");
-                  el.scrollBy({ left: 400, behavior: "smooth" });
-                }}
-              >
-                <ChevronRight size={24} />
-              </button>
+                    <div className="trt-card-icon-wrap">
+                      <Icon size={22} />
+                    </div>
+                    <div className="trt-card-body">
+                      <h3>{item.title}</h3>
+                      <div className="trt-card-bar" />
+                      <p>{item.desc}</p>
+                      <button className="trt-card-cta">
+                        {item.cta} <ArrowUpRight size={14} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
+            <button className="trt-arrow trt-arrow-right" onClick={() => {
+              document.getElementById("trt-track").scrollBy({ left: 320, behavior: "smooth" });
+            }}>
+              <ChevronRight size={20} />
+            </button>
+          </div>
 
+          {/* Bottom trust bar */}
+          <div className="trt-trust-bar">
+            <div className="trt-trust-item"><Stethoscope size={16} /> Specialist Led Care</div>
+            <div className="trt-trust-div" />
+            <div className="trt-trust-item"><Activity size={16} /> Advanced Diagnostics</div>
+            <div className="trt-trust-div" />
+            <div className="trt-trust-item"><HeartPulse size={16} /> Patient First Approach</div>
+            <div className="trt-trust-div" />
+            <div className="trt-trust-item"><ShieldCheck size={16} /> Seamless Support</div>
           </div>
         </section>
 
@@ -979,174 +1363,478 @@ export default function App() {
           </div>
         </section>
 
-        <section id="technology" className="section">
-          <div className="container">
-            <SectionTitle
-              label="Technology / Facilities"
-              title="Advanced Diagnostics and Interventional Capability"
-              description="Technology-enabled pathways for faster diagnosis, minimally invasive care and better clinical confidence."
-            />
-            <div className="tech-grid">
-              {content.technologies.map((tech) => (
-                <article key={tech} className="tech-card reveal">
-                  <ShieldCheck size={18} />
-                  <p>{tech}</p>
-                </article>
-              ))}
+        <section id="technology" className="tech-slider-section">
+          <div className="tech-section-layout">
+            <div className="container tech-section-header">
+              <p className="section-kicker">Technology / Facilities</p>
+              <h2 className="tech-section-title">
+                Advanced Diagnostics &<br />
+                <span className="tech-title-accent">Interventional Capability</span>
+              </h2>
+              <p className="tech-section-desc">
+                Technology-enabled pathways for faster diagnosis, minimally invasive care and better clinical confidence.
+              </p>
+            </div>
+            <div className="tech-slider-col">
+              <TechSlider />
             </div>
           </div>
         </section>
 
-        <section id="testimonials" className="section section-dark">
-          <div className="container">
-            <SectionTitle
-              label="Patient Testimonials"
-              title="What Families Say About Their Experience"
-              description="Human-centered care, clear communication and quality outcomes are reflected in patient feedback."
-            />
-            <div className="card-grid three">
-              {content.testimonials.map((item) => (
-                <article key={item.patient} className="testimonial-card reveal">
-                  <p>"{item.quote}"</p>
-                  <h4>{item.patient}</h4>
-                </article>
-              ))}
-            </div>
+        <section id="testimonials" className="testimonials-section">
+          {/* Header */}
+          <div className="testimonials-header">
+            <p className="testimonials-kicker">
+              <span className="t-kicker-line" />
+              <HeartPulse size={14} />
+              Patient Stories
+              <span className="t-kicker-line" />
+            </p>
+            <h2 className="testimonials-big-title">TESTIMONIAL</h2>
+            <p className="testimonials-tagline">
+              <span className="t-kicker-line short" /> Real People. Real Experiences. Real Care. <span className="t-kicker-line short" />
+            </p>
+            <div className="testimonials-branch-tag">TX Hospital Miyapur</div>
           </div>
-        </section>
 
-        <section className="section" id="stats">
+          {/* Cards */}
           <div className="container">
-            <SectionTitle
-              label="Success Stats"
-              title="Performance Indicators That Build Trust"
-              description="Care quality at scale, supported by expert teams, modern infrastructure and process-led execution."
-            />
-            <div className="stats-row reveal">
-              {content.stats.map((stat) => (
-                <div key={stat.label} className="stat-card">
-                  <h3>{stat.value}</h3>
-                  <p>{stat.label}</p>
+            <div className="testimonials-grid">
+              {[
+                {
+                  quote: "The doctors and staff at TX Hospital Miyapur were incredibly supportive and made my treatment journey smooth and comfortable.",
+                  name: "Priya S.",
+                  role: "Happy Patient",
+                  avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=120&h=120"
+                },
+                {
+                  quote: "Advanced technology and compassionate care — that's what makes TX Hospital Miyapur different from any other hospital.",
+                  name: "Ravi K.",
+                  role: "Happy Patient",
+                  avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=120&h=120"
+                },
+                {
+                  quote: "From the moment I walked in, I felt safe and cared for. Thank you, TX Hospital Miyapur!",
+                  name: "Anitha M.",
+                  role: "Happy Patient",
+                  avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=120&h=120"
+                },
+                {
+                  quote: "The cardiac team at TX Hospitals diagnosed my condition quickly and the treatment was world-class. I am fully recovered now.",
+                  name: "Suresh R.",
+                  role: "Cardiac Patient",
+                  avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=120&h=120"
+                },
+                {
+                  quote: "Excellent orthopaedic care. Dr. Keerthikar and his team handled my knee surgery with great precision. Highly recommended!",
+                  name: "Lakshmi D.",
+                  role: "Ortho Patient",
+                  avatar: "https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&q=80&w=120&h=120"
+                },
+                {
+                  quote: "The cashless insurance process was seamless and the staff guided us at every step. TX Hospitals truly puts patients first.",
+                  name: "Venkat P.",
+                  role: "Happy Patient",
+                  avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120&h=120"
+                }
+              ].map((t, i) => (
+                <div key={i} className="t-card">
+                  <div className="t-card-quote-icon">"</div>
+                  <div className="t-card-stars">★★★★★</div>
+                  <p className="t-card-text">"{t.quote}"</p>
+                  <div className="t-card-divider" />
+                  <div className="t-card-author">
+                    <img src={t.avatar} alt={t.name} className="t-card-avatar" />
+                    <div>
+                      <strong>{t.name}</strong>
+                      <span>{t.role}</span>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
+
+          {/* Footer trust bar */}
+          <div className="testimonials-trust-bar">
+            <div className="t-trust-item">
+              <ShieldCheck size={18} /> Expert Doctors
+            </div>
+            <div className="t-trust-divider" />
+            <div className="t-trust-item">
+              <Activity size={18} /> Advanced Technology
+            </div>
+            <div className="t-trust-divider" />
+            <div className="t-trust-item">
+              <HeartPulse size={18} /> Compassionate Care
+            </div>
+            <div className="t-trust-divider" />
+            <div className="t-trust-item">
+              <Sparkles size={18} /> Patient First
+            </div>
+          </div>
         </section>
 
-        <section id="insurance" className="section section-dark">
-          <div className="container">
-            <SectionTitle
-              label="Insurance / Cashless"
-              title="Cashless Admission Support"
-              description={content.insurance.summary}
-            />
-            <div className="insurance-layout">
-              <div className="insurance-providers reveal">
-                {content.insurance.providers.map((provider) => (
-                  <span key={provider}>{provider}</span>
+        <section className="stats-section" id="stats">
+          <div className="stats-section-inner">
+
+            {/* Left content */}
+            <div className="stats-left">
+              <p className="stats-kicker">
+                <span className="stats-kicker-line" />
+                <HeartPulse size={14} />
+                Success Stats
+              </p>
+              <h2 className="stats-title">
+                Performance Indicators<br />
+                <span className="stats-title-accent">That Build Trust <ShieldCheck size={28} /></span>
+              </h2>
+              <div className="stats-title-bar" />
+              <p className="stats-desc">
+                Care quality at scale, supported by expert teams, modern infrastructure and process-led execution.
+              </p>
+              <div className="stats-branch-tag">
+                <Activity size={13} /> TX Hospital Miyapur
+              </div>
+
+              {/* Stat cards row */}
+              <div className="stats-cards-row">
+                {[
+                  { icon: Stethoscope, value: "50+",        label: "Expert Doctors",      grad: "linear-gradient(135deg,#7c3aed,#be185d)" },
+                  { icon: Sparkles,    value: "13+",        label: "Specialties",         grad: "linear-gradient(135deg,#be185d,#7c3aed)" },
+                  { icon: Building2,   value: "100+",       label: "Hospital Beds",       grad: "linear-gradient(135deg,#be185d,#db2777)" },
+                  { icon: HeartPulse,  value: "1,00,000+",  label: "Happy Patients",      grad: "linear-gradient(135deg,#db2777,#f97316)" },
+                  { icon: Activity,    value: "10K+",       label: "Surgeries Performed", grad: "linear-gradient(135deg,#f97316,#db2777)" },
+                ].map(({ icon: Icon, value, label, grad }, i) => (
+                  <div key={i} className="stats-card">
+                    <div className="stats-card-icon" style={{ background: grad }}>
+                      <Icon size={22} />
+                    </div>
+                    <p className="stats-card-value" style={{ background: grad, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                      {value}
+                    </p>
+                    <p className="stats-card-label">{label}</p>
+                    <div className="stats-card-bar" style={{ background: grad }} />
+                  </div>
                 ))}
               </div>
-              <div className="insurance-steps reveal">
-                {content.insurance.steps.map((step, index) => (
-                  <article key={step}>
-                    <strong>{index + 1}</strong>
-                    <p>{step}</p>
-                  </article>
+            </div>
+
+          </div>
+
+          {/* Bottom trust bar */}
+          <div className="stats-trust-bar">
+            <div className="t-trust-item"><ShieldCheck size={16} /> Expert Doctors</div>
+            <div className="t-trust-divider" />
+            <div className="t-trust-item"><Activity size={16} /> Advanced Technology</div>
+            <div className="t-trust-divider" />
+            <div className="t-trust-item"><HeartPulse size={16} /> Compassionate Care</div>
+            <div className="t-trust-divider" />
+            <div className="t-trust-item"><Sparkles size={16} /> Patient First</div>
+          </div>
+        </section>
+
+        <section id="insurance" className="ins-section">
+          <div className="ins-top">
+            <div className="ins-left">
+              {/* Kicker */}
+              <div className="ins-kicker">
+                <ShieldCheck size={14} /> Insurance / Cashless
+              </div>
+              {/* Title */}
+              <h2 className="ins-title">
+                Cashless Admission<br />
+                <span className="ins-title-accent">Support</span>
+              </h2>
+              <div className="ins-title-bar" />
+              <p className="ins-desc">
+                All major insurance providers, TPAs and government schemes are supported with cashless assistance.
+              </p>
+
+              {/* Providers grid */}
+              <div className="ins-providers-box">
+                <p className="ins-providers-label"><ShieldCheck size={13} /> We Support</p>
+                <div className="ins-providers-grid">
+                  {[
+                    { name: "Star Health",        color: "#e11d48", bg: "#fff1f2", abbr: "SH" },
+                    { name: "New India",          color: "#1d4ed8", bg: "#eff6ff", abbr: "NI" },
+                    { name: "HDFC Ergo",          color: "#dc2626", bg: "#fef2f2", abbr: "HE" },
+                    { name: "United India",       color: "#1e40af", bg: "#eff6ff", abbr: "UI" },
+                    { name: "Medi Assist",        color: "#be185d", bg: "#fdf2f8", abbr: "MA" },
+                    { name: "Oriental",           color: "#0369a1", bg: "#f0f9ff", abbr: "OR" },
+                    { name: "National Insurance", color: "#15803d", bg: "#f0fdf4", abbr: "NI" },
+                    { name: "ICICI Lombard",      color: "#f97316", bg: "#fff7ed", abbr: "IL" },
+                    { name: "CGHS",               color: "#7c3aed", bg: "#f5f3ff", abbr: "CG" },
+                    { name: "ESI",                color: "#0891b2", bg: "#ecfeff", abbr: "ES" },
+                    { name: "Aarogyasri",         color: "#16a34a", bg: "#f0fdf4", abbr: "AA" },
+                    { name: "Many More",          color: "#94a3b8", bg: "#f8fafc", abbr: "+" },
+                  ].map((p) => (
+                    <div key={p.name} className="ins-provider-chip" style={{ "--chip-color": p.color, "--chip-bg": p.bg, borderColor: p.color + "22" }}>
+                      <div className="ins-provider-logo" style={{ background: p.bg, color: p.color }}>
+                        {p.abbr}
+                      </div>
+                      <span className="ins-provider-name" style={{ color: p.color }}>{p.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right — cashless card visual */}
+            <div className="ins-right">
+              <div className="ins-card-wrap">
+                <div className="ins-shield-bg">
+                  <ShieldCheck size={80} />
+                </div>
+                <div className="ins-card">
+                  <div className="ins-card-top">
+                    <div>
+                      <p className="ins-card-label">CASHLESS</p>
+                      <p className="ins-card-label">ADMISSION</p>
+                      <p className="ins-card-sub">WE'VE GOT YOU COVERED</p>
+                    </div>
+                    <div className="ins-card-logo">
+                      <span className="ins-card-tx">TX</span>
+                      <div>
+                        <span className="ins-card-h">HOSPITALS</span>
+                        <span className="ins-card-tag">THERAPY FOR EVERY ILLNESS</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="ins-card-chip">
+                    <div className="ins-chip-rect" />
+                  </div>
+                  <div className="ins-card-features">
+                    {[
+                      { icon: Activity,    label: "Quick\nApproval" },
+                      { icon: ShieldCheck, label: "Hassle-free\nProcess" },
+                      { icon: Building2,   label: "Wide Network\nCoverage" },
+                      { icon: CheckCircle2,label: "Paperless\nSupport" },
+                    ].map(({ icon: Icon, label }) => (
+                      <div key={label} className="ins-card-feature">
+                        <Icon size={18} />
+                        <span>{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* How it works */}
+          <div className="ins-how">
+            <div className="container">
+              <p className="ins-how-label">How It Works</p>
+              <div className="ins-how-bar" />
+              <div className="ins-steps-row">
+                {[
+                  { num: "01", icon: ShieldCheck, text: "Share your insurance card or policy details at admission." },
+                  { num: "02", icon: Activity,    text: "Our insurance desk manages pre-authorisation with your TPA." },
+                  { num: "03", icon: CheckCircle2,text: "Approved treatments proceed as cashless up to your policy limits." },
+                  { num: "04", icon: Building2,   text: "Discharge documentation and claim paperwork is fully supported." },
+                ].map((step, i) => (
+                  <div key={i} className="ins-step">
+                    <div className="ins-step-icon">
+                      <step.icon size={22} />
+                    </div>
+                    <p className="ins-step-num">{step.num}</p>
+                    <p className="ins-step-text">{step.text}</p>
+                    {i < 3 && <div className="ins-step-arrow"><ChevronRight size={18} /></div>}
+                  </div>
                 ))}
+                <div className="ins-team-box">
+                  <div className="ins-team-icon"><PhoneCall size={22} /></div>
+                  <p className="ins-team-label">Our Insurance Team</p>
+                  <p className="ins-team-text">is here to make your treatment journey smooth and stress-free.</p>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="faq" className="section">
-          <div className="container">
-            <SectionTitle
-              label="FAQ"
-              title="Answers to Common Questions"
-              description="Quick clarity on emergency access, insurance, specialist consultation and care pathways."
-            />
-            <div className="faq-list">
+        <div className="faq-cta-row">
+        <section id="faq" className="faq-section">
+          <div className="faq-inner">
+
+            {/* Left panel */}
+            <div className="faq-left">
+              <div className="faq-kicker-wrap">
+                <span className="faq-kicker-badge">
+                  <Activity size={12} /> FAQs
+                </span>
+                <span className="faq-kicker-line" />
+              </div>
+              <h2 className="faq-title">
+                Got <span className="faq-title-accent">Questions?</span><br />
+                We've Got Answers.
+              </h2>
+
+              <div className="faq-cta-card">
+                <div className="faq-cta-avatar">
+                  <img
+                    src="https://txhospitals.in/_next/image/?url=%2Fassets%2FManagement%2FDr.%20Ghantasala%20Navaneeth.webp&w=640&q=75"
+                    alt="Specialist"
+                    onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=120&h=120"; }}
+                  />
+                </div>
+                <h3>Book a Consultation</h3>
+                <p>Have questions? Book a quick call with our specialists before your visit.</p>
+                <a className="faq-cta-btn" href={`tel:${content.header.phone.replace(/\s/g, "")}`}>
+                  <PhoneCall size={16} /> Call Now
+                </a>
+              </div>
+            </div>
+
+            {/* Right panel — accordion */}
+            <div className="faq-right">
               {content.faqs.map((faq, index) => (
                 <article
                   key={faq.question}
-                  className={`faq-item reveal ${activeFaq === index ? "open" : ""}`}
+                  className={`faq2-item ${activeFaq === index ? "open" : ""}`}
+                  onClick={() => setActiveFaq(activeFaq === index ? -1 : index)}
                 >
-                  <button onClick={() => setActiveFaq(activeFaq === index ? -1 : index)}>
-                    <span>{faq.question}</span>
-                    <Activity size={18} />
-                  </button>
-                  <div className="faq-answer">
-                    <p>{faq.answer}</p>
+                  <div className="faq2-header">
+                    <span className="faq2-question">{faq.question}</span>
+                    <span className="faq2-icon">{activeFaq === index ? "×" : "+"}</span>
                   </div>
+                  {activeFaq === index && (
+                    <div className="faq2-answer">
+                      <p>{faq.answer}</p>
+                    </div>
+                  )}
                 </article>
               ))}
             </div>
+
           </div>
         </section>
 
-        <section id="final-cta" className="section final-cta">
-          <div className="container final-wrap">
-            <div className="final-copy reveal">
-              <p className="section-kicker">Final CTA</p>
-              <h2>{content.finalCta.title}</h2>
-              <p>{content.finalCta.subtitle}</p>
-              <a className="btn btn-primary" href={`tel:${content.finalCta.contact.replace(/\s/g, "")}`}>
-                <PhoneCall size={16} />
-                {content.finalCta.contact}
+        <section id="final-cta" className="fcta-section">
+          {/* Background building image */}
+          <div className="fcta-bg">
+            <img src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&q=80&w=1200" alt="TX Hospitals" />
+          </div>
+
+          <div className="fcta-inner">
+            {/* Left */}
+            <div className="fcta-left">
+              {/* TX Logo */}
+              <div className="fcta-logo">
+                <span className="fcta-logo-tx">TX</span>
+                <div>
+                  <span className="fcta-logo-h">HOSPITALS</span>
+                  <span className="fcta-logo-tag">THERAPY FOR EVERY ILLNESS</span>
+                </div>
+              </div>
+
+              {/* Kicker + Title */}
+              <div className="fcta-kicker-row">
+                <span className="fcta-kicker-line" />
+                <span className="fcta-kicker-text">Final CTA</span>
+              </div>
+              <h2 className="fcta-title">
+                Take the Next Step<br />
+                <span className="fcta-title-accent">Toward Better Health</span>
+              </h2>
+              <div className="fcta-heartline">
+                <span className="fcta-hl-line" />
+                <HeartPulse size={20} className="fcta-hl-icon" />
+                <span className="fcta-hl-line" />
+              </div>
+              <p className="fcta-desc">{content.finalCta.subtitle}</p>
+
+              {/* Feature icons */}
+              <div className="fcta-features">
+                {[
+                  { icon: Stethoscope, label: "Expert\nSpecialists" },
+                  { icon: ShieldCheck,  label: "Advanced\nCare" },
+                  { icon: HeartPulse,  label: "Compassionate\nSupport" },
+                ].map(({ icon: Icon, label }) => (
+                  <div key={label} className="fcta-feature">
+                    <div className="fcta-feature-icon"><Icon size={22} /></div>
+                    <span>{label}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Phone */}
+              <a className="fcta-phone" href={`tel:${content.finalCta.contact.replace(/\s/g, "")}`}>
+                <div className="fcta-phone-icon"><PhoneCall size={20} /></div>
+                <div>
+                  <span className="fcta-phone-label">Need Help?</span>
+                  <span className="fcta-phone-num">{content.finalCta.contact}</span>
+                </div>
               </a>
             </div>
-            <form className="appointment-form reveal" onSubmit={onSubmitAppointment}>
-              <label>
-                Full Name
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={handleInput}
-                  placeholder="Enter your name"
-                  required
-                />
-              </label>
-              <label>
-                Phone Number
-                <input
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleInput}
-                  placeholder="Enter your phone"
-                  required
-                />
-              </label>
-              <label>
-                Concern / Department
-                <input
-                  name="concern"
-                  value={form.concern}
-                  onChange={handleInput}
-                  placeholder="Cardiac, Orthopedic, Oncology..."
-                  required
-                />
-              </label>
-              <label>
-                Preferred Date
-                <input
-                  type="date"
-                  name="preferredDate"
-                  value={form.preferredDate}
-                  onChange={handleInput}
-                />
-              </label>
-              <button className="btn btn-primary" type="submit" disabled={formState.loading}>
-                {formState.loading ? "Submitting..." : content.finalCta.primary}
-              </button>
-              {formState.message ? (
-                <p className={formState.error ? "form-error" : "form-success"}>
-                  {formState.message}
-                </p>
-              ) : null}
-            </form>
+
+            {/* Right — form card */}
+            <div className="fcta-right">
+              <div className="fcta-form-card">
+                {/* Calendar icon top */}
+                <div className="fcta-form-icon">
+                  <Activity size={26} />
+                </div>
+
+                <div className="fcta-form-header">
+                  <div className="fcta-form-kicker">
+                    <span className="fcta-fk-line" /> BOOK YOUR APPOINTMENT <span className="fcta-fk-line" />
+                  </div>
+                  <p className="fcta-form-sub">We're here to care for you</p>
+                </div>
+
+                <form className="fcta-form" onSubmit={onSubmitAppointment}>
+                  <div className="fcta-field">
+                    <div className="fcta-field-icon"><Stethoscope size={16} /></div>
+                    <div className="fcta-field-inner">
+                      <label>Full Name</label>
+                      <input name="name" value={form.name} onChange={handleInput} placeholder="Enter your name" required />
+                    </div>
+                  </div>
+                  <div className="fcta-field">
+                    <div className="fcta-field-icon"><PhoneCall size={16} /></div>
+                    <div className="fcta-field-inner">
+                      <label>Phone Number</label>
+                      <input name="phone" value={form.phone} onChange={handleInput} placeholder="Enter your phone" required />
+                    </div>
+                  </div>
+                  <div className="fcta-field">
+                    <div className="fcta-field-icon"><Activity size={16} /></div>
+                    <div className="fcta-field-inner">
+                      <label>Concern / Department</label>
+                      <input name="concern" value={form.concern} onChange={handleInput} placeholder="Cardiac, Orthopedic, Oncology..." required />
+                    </div>
+                  </div>
+                  <div className="fcta-field">
+                    <div className="fcta-field-icon"><Building2 size={16} /></div>
+                    <div className="fcta-field-inner">
+                      <label>Preferred Date</label>
+                      <input type="date" name="preferredDate" value={form.preferredDate} onChange={handleInput} />
+                    </div>
+                  </div>
+                  <button className="fcta-submit" type="submit" disabled={formState.loading}>
+                    {formState.loading ? "Submitting..." : "Book Appointment"}
+                    <ArrowUpRight size={18} />
+                  </button>
+                  {formState.message && (
+                    <p className={formState.error ? "form-error" : "form-success"}>{formState.message}</p>
+                  )}
+                </form>
+
+                {/* Bottom trust */}
+                <div className="fcta-trust">
+                  <div className="fcta-trust-item"><ShieldCheck size={14} /> Patient Safety First</div>
+                  <div className="fcta-trust-item"><Activity size={14} /> NABH Accredited</div>
+                  <div className="fcta-trust-item"><Clock3 size={14} /> 24/7 Support</div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
+      </div>
       </main>
+      
+      <Footer />
 
       {/* Floating action buttons */}
       <div className="floating-actions">
